@@ -1,0 +1,65 @@
+/* Estilos globales */
+.app {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+/* Estilo del elemento seleccionado */
+.selected-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 20px auto;
+  width: 300px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.selected-item img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+/* Grid para los elementos */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Tarjetas de los elementos */
+.item-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s, background-color 0.2s;
+  background-color: #fff;
+}
+
+.item-card:hover {
+  transform: scale(1.05);
+  background-color: #f0f0f0;
+}
+
+.item-card img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.item-card h3 {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+.item-card p {
+  font-size: 0.9rem;
+  color: #666;
+}
