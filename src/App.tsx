@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from "react";
-import "./App.css"; // Importa los estilos
+import React, { useEffect, useState, Suspense } from "react";
+import "./App.css"; 
 
 const App = () => {
-  const [items, setItems] = useState([]); // Datos obtenidos de la API
-  const [selectedItem, setSelectedItem] = useState(null); // Elemento seleccionado
-
-  // Llamada a la API y carga de datos guardados en `localStorage`
+  const [items, setItems] = useState([]); 
+  const [selectedItem, setSelectedItem] = useState(null); 
+  const [isLoading, setIsLoading] = useState(true); 
+  const [error, setError] = useState(null); 
+  
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch("https://rickandmortyapi.com/api/character");
-      const data = await response.json();
-      setItems(data.results);
+      try {
+        const response = await fetch("https://rickandmortyapi.com/api/character");
+        if (!response.ok) {
+          throw new Error("Error al cargar los datos de la API");
+        }
+        const data = await response.json();
+        setItems(data.results);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     const savedItem = JSON.parse(localStorage.getItem("selectedItem") || "null");
@@ -20,10 +30,18 @@ const App = () => {
   }, []);
 
   // Manejar selección
-  const handleSelect = (item: any) => {
+  const handleSelect = (item) => {
     setSelectedItem(item);
     localStorage.setItem("selectedItem", JSON.stringify(item));
   };
+
+  if (isLoading) {
+    return <div className="loading">Cargando...</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
 
   return (
     <div className="app">
@@ -36,7 +54,7 @@ const App = () => {
         </div>
       )}
       <div className="items-grid">
-        {items.map((item: any) => (
+        {items.map((item) => (
           <div
             key={item.id}
             onClick={() => handleSelect(item)} // Hacer clic en este elemento
@@ -52,4 +70,13 @@ const App = () => {
   );
 };
 
-export default App;
+const AppWrapper = () => {
+  return (
+    <Suspense fallback={<div className="loading">Cargando la aplicación...</div>}>
+      <App />
+    </Suspense>
+  );
+};
+
+export default AppWrapper;
+
