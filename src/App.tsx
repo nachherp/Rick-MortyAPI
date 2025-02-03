@@ -1,47 +1,24 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useState, Suspense } from "react";
+import useSWR from "swr";
 import "./App.css"; 
 
-const App = () => {
-  const [items, setItems] = useState([]); 
-  const [selectedItem, setSelectedItem] = useState(null); 
-  const [isLoading, setIsLoading] = useState(true); 
-  const [error, setError] = useState(null); 
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://rickandmortyapi.com/api/character");
-        if (!response.ok) {
-          throw new Error("Error al cargar los datos de la API");
-        }
-        const data = await response.json();
-        setItems(data.results);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-    const savedItem = JSON.parse(localStorage.getItem("selectedItem") || "null");
-    if (savedItem) setSelectedItem(savedItem);
+const App: React.FC = () => {
+  const { data, error } = useSWR("https://rickandmortyapi.com/api/character", fetcher);
+  const [selectedItem, setSelectedItem] = useState(() => {
+    return JSON.parse(localStorage.getItem("selectedItem") || "null");
+  });
 
-    fetchData();
-  }, []);
+  if (error) return <div className="error">Error: {error.message}</div>;
+  if (!data) return <div className="loading">Cargando...</div>;
 
-  // Manejar selección
-  const handleSelect = (item) => {
+  const items = data.results;
+
+  const handleSelect = (item: any) => {
     setSelectedItem(item);
     localStorage.setItem("selectedItem", JSON.stringify(item));
   };
-
-  if (isLoading) {
-    return <div className="loading">Cargando...</div>;
-  }
-
-  if (error) {
-    return <div className="error">Error: {error}</div>;
-  }
 
   return (
     <div className="app">
@@ -54,10 +31,10 @@ const App = () => {
         </div>
       )}
       <div className="items-grid">
-        {items.map((item) => (
+        {items.map((item: any) => (
           <div
             key={item.id}
-            onClick={() => handleSelect(item)} // Hacer clic en este elemento
+            onClick={() => handleSelect(item)}
             className="item-card"
           >
             <img src={item.image} alt={item.name} />
@@ -70,7 +47,7 @@ const App = () => {
   );
 };
 
-const AppWrapper = () => {
+const AppWrapper: React.FC = () => {
   return (
     <Suspense fallback={<div className="loading">Cargando la aplicación...</div>}>
       <App />
@@ -79,4 +56,3 @@ const AppWrapper = () => {
 };
 
 export default AppWrapper;
-
